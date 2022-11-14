@@ -137,7 +137,10 @@ void PrintFile_StateProbabilites_NewBasis(map<__int128_t, unsigned int > Kset, m
 
   for (it_P = P_all.begin(); it_P!=P_all.end(); ++it_P)
   {   
-    file_P_sig << bitset<n>(it_P->first) << "\t " << (it_P->second).P_D_s << "\t " << (it_P->second).P_MCM << endl;
+    bitset<n> hi_sig{ static_cast<unsigned long long>((it_P->first) >> 64) },
+          lo_sig{ static_cast<unsigned long long>(it_P->first) },
+          bitsig{ (hi_sig << 64) | lo_sig };
+    file_P_sig << bitsig << "\t " << (it_P->second).P_D_s << "\t " << (it_P->second).P_MCM << endl;
   }
 
   file_P_sig.close();
@@ -222,7 +225,11 @@ void PrintFile_MCM_Info(list<__int128_t> Basis, map<unsigned int, __int128_t> MC
   int i = 1;
   for (list<__int128_t>::iterator it = Basis.begin(); it != Basis.end(); it++)
   {
-    file_MCM_info << "##\t sig_" << i << " = " << bitset<n>(*it) << endl; i++;
+    bitset<n> hi_sig{ static_cast<unsigned long long>((*it) >> 64) },
+            lo_sig{ static_cast<unsigned long long>(*it) },
+            bitsig{ (hi_sig << 64) | lo_sig };
+
+    file_MCM_info << "##\t sig_" << i << " = " << bitsig << endl; i++;
   } file_MCM_info << "##" << endl;
 
   // Print info about the model -- Print MCM:
@@ -233,7 +240,12 @@ void PrintFile_MCM_Info(list<__int128_t> Basis, map<unsigned int, __int128_t> MC
   for (map<unsigned int, __int128_t>::iterator it = MCM_Partition.begin(); it != MCM_Partition.end(); it++)
   {    
     __int128_t Part = (*it).second;
-    file_MCM_info << "##\t MCM_Part_" << i << " = " << bitset<n>(Part) << endl; i++;
+
+    bitset<n> hi_Part{ static_cast<unsigned long long>(Part >> 64) },
+            lo_Part{ static_cast<unsigned long long>(Part) },
+            bit_Part{ (hi_Part << 64) | lo_Part };
+
+    file_MCM_info << "##\t MCM_Part_" << i << " = " << bit_Part << endl; i++;
   }
   file_MCM_info << "##" << endl;
 
@@ -286,7 +298,17 @@ void PrintFile_StateProbabilites_OriginalBasis(map<__int128_t, unsigned int > Ns
   for (map<__int128_t, Proba>::iterator it_P = P_all.begin(); it_P!=P_all.end(); ++it_P)
   {   
     s = it_P->first;
-    file_Ps << bitset<n>(s) << "\t" <<  (it_P->second).P_D_s << "\t" << (it_P->second).P_MCM << "\t" << bitset<n>((it_P->second).sig) << endl;
+        
+    bitset<n> hi_s{ static_cast<unsigned long long>(s >> 64) },
+            lo_s{ static_cast<unsigned long long>(s) },
+            bits{ (hi_s << 64) | lo_s };
+
+    bitset<n> hi_sig{ static_cast<unsigned long long>(((it_P->second).sig) >> 64) },
+            lo_sig{ static_cast<unsigned long long>(((it_P->second).sig)) },
+            bitsig{ (hi_sig << 64) | lo_sig };
+
+    file_Ps << bits << "\t" <<  (it_P->second).P_D_s << "\t" << (it_P->second).P_MCM << "\t" << bitsig << endl;
+    //file_Ps << bitset<n>(s) << "\t" <<  (it_P->second).P_D_s << "\t" << (it_P->second).P_MCM << "\t" << bitset<n>((it_P->second).sig) << endl;
 
     k = count_bits(s); //bitset<n>(s).count();
     Pk_D[k] += (it_P->second).P_D_s;      // P[k] in the data

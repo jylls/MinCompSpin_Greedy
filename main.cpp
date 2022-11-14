@@ -1,5 +1,6 @@
-// To compile: g++ -std=c++11 -O3 main.cpp Operations_OnData.cpp LogE.cpp LogL.cpp Complexity.cpp info_quant.cpp best_basis.cpp Basis_Choice.cpp P_s.cpp metropolis.cpp Best_MCM_Greedy.cpp
+// To compile: g++ -std=c++11 -O3 main.cpp Operations_OnData.cpp LogE.cpp LogL.cpp Complexity.cpp info_quant.cpp Basis_Choice.cpp P_s.cpp Best_MCM_Greedy.cpp 
 // To run: time ./a.out
+// Additional files: best_basis.cpp metropolis.cpp
 //
 #define _USE_MATH_DEFINES
 #include <iostream>

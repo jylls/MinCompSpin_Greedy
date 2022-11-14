@@ -112,7 +112,10 @@ void PrintTerm_Basis(list<__int128_t> Basis_li)
   int i = 1;
   for (list<__int128_t>::iterator it = Basis_li.begin(); it != Basis_li.end(); it++)
   {
-    cout << "##\t " << i << " \t " << bitset<n>(*it) << endl; i++;
+    bitset<n> hi{ static_cast<unsigned long long>((*it) >> 64) },
+            lo{ static_cast<unsigned long long>((*it)) },
+            bits{ (hi << 64) | lo };
+    cout << "##\t " << i << " \t " << bits << endl; i++;
   } 
   cout << "##" << endl;
 }
