@@ -7,7 +7,7 @@ using namespace std;
 /********************************************************************/
 
 // number of binary (spin) variables:
-const unsigned int n = 9; //120;  
+const unsigned int n = 9;  
 
 // INPUT DATA FILES (optional):  
 // the input datafile can also be specified directly in the main() function, as an argument of the function "read_datafile()":
@@ -47,13 +47,13 @@ struct Proba {
 /********************************************************************/
 /****************    FOR METROPOLIS ALGORITHM    ********************/
 /********************************************************************/
-    struct Interaction
-    {
-        __int128_t Op;      // binary operator associated to the interaction
-        double g;   // parameter of the interaction in {-1,+1} representation
-        double av_M;      // average in the Model
-        double av_D;      // average in the generated Data
-    };
+struct Interaction
+{
+    __int128_t Op;      // binary operator associated to the interaction
+    double g;   // parameter of the interaction in {-1,+1} representation
+    double av_M;      // average in the Model
+    double av_D;      // average in the generated Data
+};
 
 
 /********************************************************************/

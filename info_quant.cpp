@@ -8,6 +8,11 @@ using namespace std;
 
 #include "data.h"
 
+/******************************************************************************/
+/**************************    Check sub-MCM:   *******************************/
+/***************   Check if "fp1" is a sub-partition of "fp2":  ***************/
+/******************************************************************************/
+
 bool is_subset(map<unsigned int, __int128_t> fp1, map<unsigned int, __int128_t> fp2)
 {
     bool flag;
@@ -27,6 +32,7 @@ bool is_subset(map<unsigned int, __int128_t> fp1, map<unsigned int, __int128_t> 
     }
     return flag;
 }
+
 
 double Entropy(map <__int128_t, unsigned int> Kset, unsigned int N)
 {

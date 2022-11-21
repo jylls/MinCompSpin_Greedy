@@ -1,7 +1,6 @@
 #include <set>
 
 
-
 /******************************************************************************/
 /******************************************************************************/
 /*********************     SPECIFY the BASIS    *******************************/
@@ -44,8 +43,10 @@ map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file = dataf
 // *** in which case the function will reduce the dataset to the subspace defined by the specified basis.
 map<__int128_t, unsigned int> build_Kset(map<__int128_t, unsigned int> Nset, list<__int128_t> Basis, bool print_bool=false);
 
-
-
+/*** REDUCE Kset:    **********************************************************/
+/******************************************************************************/
+// *** Remove all the states that occur less than K times in the dataset:
+void Reduce_Kset(map<__int128_t, unsigned int> &Kset, unsigned int K, unsigned int *N);
 
 /******************************************************************************/
 /******************************************************************************/
@@ -85,10 +86,14 @@ double Complexity_MCM(map<uint32_t, uint32_t> Partition, unsigned int N, double 
 /******************************************************************************/
 /******************************************************************************/
 /********************   DEFINE MCMs and PRINT INFO   **************************/
+/***********************    see  "MCM_info.ccp"   *****************************/
 /******************************************************************************/
 /******************************************************************************/
 
 unsigned int count_bits(__int128_t bool_nb);
+
+// *** Read MCM from a file:
+//map<unsigned int, __int128_t> read_MCM_fromfile(string Input_MCM_file = communityfile);
 
 // *** Define an MCM from a file; Each part must be encoded in a binary number over n spins:
 //map<uint32_t, uint32_t> Read_MCMParts_BinaryRepresentation(string MCM_binary_filename);
@@ -97,8 +102,8 @@ unsigned int count_bits(__int128_t bool_nb);
 pair<bool, unsigned int> check_partition(map<unsigned int, __int128_t> Partition);  // the second element is the rank of the partition (dimension of the MCM)
 
 // *** Print information about the MCM specified in `MCM_Partition`:
-void PrintTerminal_MCM_Info(map<__int128_t, unsigned int> Kset, unsigned int N, map<unsigned int, __int128_t> MCM_Partition);
-void Print_Partition(map<unsigned int, __int128_t> partition);
+//void PrintTerminal_MCM_Info(map<__int128_t, unsigned int> Kset, unsigned int N, map<unsigned int, __int128_t> MCM_Partition);
+void Print_MCM_Partition(map<unsigned int, __int128_t> partition);
 
 // *** Create successive independent models defined on the new basis, and print the corresponding information:
 //void PrintInfo_All_Indep_Models(map<uint32_t, unsigned int> Kset, unsigned int N);
@@ -106,20 +111,13 @@ void Print_Partition(map<unsigned int, __int128_t> partition);
 // *** Create successive Sub-complete models defined on the new basis, and print the corresponding information:
 //void PrintInfo_All_SubComplete_Models(map<uint32_t, unsigned int> Kset, unsigned int N);
 
-map<unsigned int, __int128_t> read_communities(string file);
-
-// Check if subset
-bool is_subset(map<unsigned int, __int128_t> fp1, map<unsigned int, __int128_t> fp2);
-
 
 /******************************************************************************/
 /******************************************************************************/
 /***************************   Find Best MCM   ********************************/
 /******************************************************************************/
 /******************************************************************************/
-
-map<unsigned int, __int128_t> Matrix(map<__int128_t, unsigned int> Kset, unsigned int N, unsigned int r = n);
-
+//map<unsigned int, __int128_t> MCM_GreedySearch(map<__int128_t, unsigned int> Kset, unsigned int N, unsigned int r = n);
 
 
 /******************************************************************************/
@@ -136,6 +134,8 @@ double JS_divergence(map<__int128_t, double> Prob1, map<__int128_t, double> Prob
 double Var_of_Inf(map<unsigned int, __int128_t> Partition1, map<unsigned int, __int128_t> Partition2);
 double Norm_Mut_info(map<unsigned int, __int128_t> Partition1, map<unsigned int, __int128_t> Partition2);
 
+// Check if the MCM in "fp1" is a sub-partition of the MCM in "fp2":
+bool is_subset(map<unsigned int, __int128_t> fp1, map<unsigned int, __int128_t> fp2);
 
 
 /******************************************************************************/

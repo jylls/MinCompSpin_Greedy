@@ -5,13 +5,12 @@
 
 using namespace std;
 
+/******************************************************************************/
+/*******************************    CONSTANTS     *****************************/
+/******************************************************************************/
 #include "data.h"
 
-
-/******************************************************************************/
-/**************************   MODEL COMPLEXITY   ******************************/
-/******************************************************************************/
-double GeomComplexity_SubCM(unsigned int m);
+pair<bool, unsigned int> check_partition(map<unsigned int, __int128_t> Partition);
 
 /******************************************************************************/
 /**************** Log-Evidence (LogE) of a sub-complete model  ****************/
@@ -86,46 +85,6 @@ double LogE_SubCM(map<__int128_t, unsigned int> Kset, __int128_t Ai, unsigned in
 /******************************************************************************/
 /****************************   LogE of a MCM   *******************************/
 /******************************************************************************/
-//check if *Partition* is an actual partition of the r elements, 
-// i.e., that no basis element appears in more than 1 part of the partition.
-
-unsigned int count_bits(__int128_t bool_nb)
-{
-  bitset<n> hi{ static_cast<unsigned long long>(bool_nb >> 64) },
-            lo{ static_cast<unsigned long long>(bool_nb) },
-            bits{ (hi << 64) | lo };
-  return bits.count();
-}
-/*
-pair<bool, unsigned int> check_partition(map<unsigned int, __int128_t> Partition)
-{
-  map<unsigned int, __int128_t>::iterator Part;
-  __int128_t sum = 0;
-  unsigned int rank = 0; 
-
-  for (Part = Partition.begin(); Part != Partition.end(); Part++)
-  {
-    sum |= (*Part).second;
-    rank += count_bits((*Part).second); 
-  }
-
-  return make_pair((count_bits(sum) == rank), rank); 
-}*/
-
-pair<bool, unsigned int> check_partition(map<unsigned int, __int128_t> Partition)
-{
-  map<unsigned int, __int128_t>::iterator Part;
-  __int128_t sum = 0;
-  unsigned int rank = 0; 
-
-  for (Part = Partition.begin(); Part != Partition.end(); Part++)
-  {
-    sum |= (*Part).second;
-    rank += count_bits((*Part).second); 
-  }
-
-  return make_pair((count_bits(sum) == rank), rank); 
-}
 
 double LogE_MCM(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t> Partition, unsigned int N, unsigned int r = n, bool print_bool = false)
 {

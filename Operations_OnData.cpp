@@ -13,37 +13,8 @@
 /********************************************************************/
 #include "data.h"
 
-map<unsigned int, __int128_t> read_communities(string file)
-{
-    map<unsigned int, __int128_t> Partition;
-
-    string line, line2;
-    __int128_t Op = 1;
-    Op <<= n - 1;
-    vector<int> comm;
-
-    ifstream myfile(file.c_str());
-    if (myfile.is_open())
-    {
-        while (getline(myfile, line))
-        {
-            stringstream ss(line);
-            while (getline(ss, line2, '\t'))
-            {
-                comm.push_back(stoi(line2));
-            }
-            Partition[comm[1]] += Op;
-            Op >>= 1;
-
-            comm.clear();
-        }
-        myfile.close();
-    }
-    return Partition;
-}
-
 /******************************************************************************/
-/**************************     READ FILE    **********************************/
+/***********************     READ DATA FILE    ********************************/
 /******************************************************************************/
 /**************    READ DATA and STORE them in Nset    ************************/
 map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file = datafilename)    // O(N)  where N = data set size
@@ -87,7 +58,7 @@ map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file = dataf
 /******************************************************************************/
 /**************************     PRINT Nset   **********************************/
 /******************************************************************************/
-void Print_File_Nset (map<__int128_t, unsigned int> Nset, unsigned int N, string OUTPUTfilename)
+void Print_File_Nset(map<__int128_t, unsigned int> Nset, unsigned int N, string OUTPUTfilename)
 // map.second = nb of time that the state map.first appears in the data set
 {
   map<__int128_t, unsigned int>::iterator it;
@@ -143,7 +114,7 @@ __int128_t transform_mu_basis(__int128_t mu, list<__int128_t> basis)
 }
 
 /******************************************************************************/
-/************************** K_SET *********************************************/
+/******************************   K_SET   *************************************/
 /******************************************************************************/
 // Build Kset for the states written in the basis of the m-chosen independent 
 // operator on which the SC model is based:
@@ -178,3 +149,37 @@ map<__int128_t, unsigned int> build_Kset(map<__int128_t, unsigned int> Nset, lis
 
   return Kset;
 }
+
+
+/******************************************************************************/
+/****************************   REDUCE K_SET   ********************************/
+/******************************************************************************/
+// Remove all the states that occur less than a chosen number K of times
+
+void Reduce_Kset(map<__int128_t, unsigned int> &Kset, unsigned int K, unsigned int *N)
+{
+    cout << endl << "States removed from Kset:" << endl;
+
+    map<__int128_t, unsigned int>::iterator it;
+    unsigned int* counter = (unsigned int*)malloc((K+1)*sizeof(unsigned int));
+    for(int i=0; i<=K; i++)
+        {   counter[i]=0;   }
+
+    for (it = Kset.begin(); it!=Kset.end(); )
+    {
+        if ((*it).second <= K)
+        {    
+            counter[(*it).second]++;
+            it = Kset.erase(it);
+        }
+        else { ++it; }
+    }
+
+    for(int i=1; i<=K; i++)
+    {   
+        cout << "\t -- " << counter[i] << " states appearing ks = " << i << " times;" << endl;   
+        (*N) -= i*counter[i];   // reduced the total number of states by the number of states removed
+    }
+    cout << endl;
+}
+
