@@ -1,7 +1,7 @@
 ########################################################################################################################
 ####################################      CONSTANT TO SPECIFY     ######################################################
 ########################################################################################################################
-#### If the variables are left empty:           ########################################################################
+#### If the following two variables are left empty:           ##########################################################
 ####     then the program will automatically use the filename and number of variables specifed in data.h    ############
 ########################################################################################################################
 
@@ -28,27 +28,31 @@ CXXFLAGS = -std=c++11 -O2  #Extra flags to give to the C++ compiler
 #%.o : %.c
 #		$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
 
-directory = MCM
-objects = tools.o LogE.o LogL.o Complexity.o MCM_info.o Basis_Choice.o P_s.o Operations_OnData.o info_quant.o BestMCM_GreedySearch.o
+### MCM Files:
+DIR_MCM = MCM
+objects_MCM = tools.o LogE.o LogL.o Complexity.o MCM_info.o Basis_Choice.o P_s.o Operations_OnData.o info_quant.o BestMCM_GreedySearch.o
 
-# String substitution: add the directory name:
-# As an example, hello.o turns into ./MCM/hello.o
-OBJS := $(objects:%=$(directory)/%)
+### Libraries:
+DIR_LIB = Libraries
 
-a.out: $(OBJS) main.o main_routines.o library.hpp.gch
-	g++ -std=c++11 main.o main_routines.o $(OBJS)
+# String substitution: add the directory name: # As an example, hello.o turns into ./MCM/hello.o
+OBJS := $(objects_MCM:%=$(DIR_MCM)/%)
 
-main.o: main.cpp library.hpp.gch data.h
-	g++ -std=c++11 -c main.cpp -include library.hpp # Compile main.cpp
 
-main_routines.o: main_routines.cpp library.hpp.gch
-	g++ -std=c++11 -c main_routines.cpp -include library.hpp # Compile main_routines.cpp
+a.out: $(OBJS) $(DIR_LIB)/main.o $(DIR_LIB)/main_routines.o $(DIR_LIB)/library.hpp.gch
+	g++ -std=c++11 $(DIR_LIB)/main.o $(DIR_LIB)/main_routines.o $(OBJS)
 
-library.hpp.gch: library.hpp
-	g++ -std=c++11 -c library.hpp
+$(DIR_LIB)/main.o: main.cpp data.h $(DIR_LIB)/library.hpp.gch
+	g++ -std=c++11 -c main.cpp -include $(DIR_LIB)/library.hpp -o $(DIR_LIB)/main.o   # Compile main.cpp
+
+$(DIR_LIB)/main_routines.o: $(DIR_LIB)/main_routines.cpp $(DIR_LIB)/library.hpp.gch
+	g++ -std=c++11 -c $(DIR_LIB)/main_routines.cpp -include $(DIR_LIB)/library.hpp -o $(DIR_LIB)/main_routines.o  # Compile main_routines.cpp
+
+$(DIR_LIB)/library.hpp.gch: $(DIR_LIB)/library.hpp
+	g++ -std=c++11 -c $(DIR_LIB)/library.hpp
 
 run: a.out
 	./a.out $(datafilename) $n
 
 clean:
-	rm $(OBJS) library.hpp.gch main_routines.o main.o a.out
+	rm $(OBJS) $(DIR_LIB)/library.hpp.gch $(DIR_LIB)/main_routines.o $(DIR_LIB)/main.o a.out
