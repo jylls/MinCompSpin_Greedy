@@ -1,13 +1,43 @@
-#include <bitset>
-#include <cmath>       /* tgamma */
+#include <iostream>
 #include <map>
 #include <list>
 #include <fstream>
 
 using namespace std;
 
-#include "data.h"
 
+/******************************************************************************/
+/***************************   ADD OUTPUT FOLDER    ***************************/
+/******************************************************************************/
+string OutputFile_Add_Location(string filename);  // defined in main.cpp
+
+/******************************************************************************/
+/***************************   Constant variables   ***************************/
+/******************************************************************************/
+const __int128_t un = 1;
+
+/********************************************************************/
+/*********************    Proba Structure    ************************/
+/********************************************************************/
+struct Proba {
+    __int128_t s;         // state in the original basis
+    __int128_t sig;       // state in the new basis
+
+    double P_D_s = 1.;    // empirical probability of s  
+    double P_D_sig = 1.;  // empirical probability of sig --> this should be the same then s if r=n, i.e. if the MCM models all the n spins
+    double P_MCM = 1.;  // model probability of s 
+};
+
+/******************************************************************************/
+/******************   TOOL Functions from "tools.cpp"   ***********************/
+/******************************************************************************/
+unsigned int Bitset_count(__int128_t bool_nb);
+string int_to_bstring(__int128_t bool_nb, unsigned int n);
+
+//check if *Partition* is an actual partition of the basis elements, 
+// i.e., that no basis element appears in more than 1 part of the partition.
+// i.e., that each basis element only appears in a single part of the partition.
+pair<bool, unsigned int> check_partition(map<unsigned int, __int128_t> Partition); 
 
 /******************************************************************************/
 /****************   Return Kset over a chosen sub-basis b_a    ****************/
@@ -20,7 +50,7 @@ map<__int128_t, unsigned int> Build_Kset_ba(map<__int128_t, unsigned int> Kset, 
   __int128_t s;        // state
   unsigned int ks=0; // number of time state s appear in the dataset
 
-  //cout << "--->> Build Kset for SC Model based on " << bitset<n>(Ai) << " for MCM.." << endl << endl;
+  //cout << "--->> Build Kset for SC Model based on " << int_to_bstring(Ai, n) << " for MCM.." << endl << endl;
 
 //Build Kset_ba:
   for (it = Kset.begin(); it!=Kset.end(); ++it)
@@ -34,15 +64,6 @@ map<__int128_t, unsigned int> Build_Kset_ba(map<__int128_t, unsigned int> Kset, 
 
   return Kset_new;
 }
-
-/******************************************************************************/
-/****************************      Check partition     ************************/
-/******************************************************************************/
-//check if *Partition* is an actual partition of the basis elements, 
-// i.e., that no basis element appears in more than 1 part of the partition.
-// i.e., that each basis element only appears in a single part of the partition.
-pair<bool, unsigned int> check_partition(map<unsigned int, __int128_t> Partition);
-
 
 /******************************************************************************/
 /*****************   Compute the contribution to P_MCM(s)   *******************/
@@ -76,7 +97,7 @@ void update_proba_MCM(map<__int128_t, Proba> &all_P, map<__int128_t, unsigned in
 /*************      Compute the model probabilities     ***************/
 
 // This function can be used directly on the original basis, by replacing Kset by Nset:
-map<__int128_t, Proba> P_sig(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t> Partition, unsigned int N) // Probabilities in the sigma basis
+map<__int128_t, Proba> P_sig(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t> Partition, unsigned int N, unsigned int r) // Probabilities in the sigma basis
 {
   // Fill in the data probability:
   map<__int128_t, Proba> all_P;
@@ -87,14 +108,13 @@ map<__int128_t, Proba> P_sig(map<__int128_t, unsigned int> Kset, map<unsigned in
   unsigned int ks=0; // number of time state s appear in the dataset
 
   // Check partition:
-  //bool Is_partition = check_partition(Partition);
   pair<bool, unsigned int> Is_partition = check_partition(Partition);
   unsigned int rank = Is_partition.second;
 
   if (!Is_partition.first) {cout << "Error, the argument is not a partition: the function returned an empty map for P[s]." << endl; }
   else
   { 
-    double pre_factor = 1./((double) (un << (n-rank))); 
+    double pre_factor = 1./((double) (un << (r-rank))); 
 
     for (it = Kset.begin(); it!=Kset.end(); ++it)
     {   
@@ -122,25 +142,24 @@ map<__int128_t, Proba> P_sig(map<__int128_t, unsigned int> Kset, map<unsigned in
 
 /*************      Print the model probabilities     ***************/
 
-void PrintFile_StateProbabilites_NewBasis(map<__int128_t, unsigned int > Kset, map<unsigned int, __int128_t> MCM_Partition, unsigned int N, string filename = "Result")
+void PrintFile_StateProbabilites_NewBasis(map<__int128_t, unsigned int > Kset, map<unsigned int, __int128_t> MCM_Partition, unsigned int N, unsigned int r, string filename = "Result")
 {
   // Probabilities in the sigma basis:
-  map<__int128_t, Proba> P_all = P_sig(Kset, MCM_Partition, N);
+  map<__int128_t, Proba> P_all = P_sig(Kset, MCM_Partition, N, r);
   map<__int128_t, Proba>::iterator it_P;
 
   string Psig_filename = filename + "_DataVSMCM_Psig.dat";
 
   cout << "--->> Print the state probabilities P(sig) in the file: \'" << Psig_filename << "\'" << endl << endl;
 
-  fstream file_P_sig((OUTPUT_directory + Psig_filename), ios::out);
+  //fstream file_P_sig((OUTPUT_directory + Psig_filename), ios::out);
+  fstream file_P_sig(OutputFile_Add_Location(Psig_filename), ios::out);
+
   file_P_sig << "## 1:sig \t 2:P_D(sig) \t 3:P_MCM(sig)" << endl;
 
   for (it_P = P_all.begin(); it_P!=P_all.end(); ++it_P)
   {   
-    bitset<n> hi_sig{ static_cast<unsigned long long>((it_P->first) >> 64) },
-          lo_sig{ static_cast<unsigned long long>(it_P->first) },
-          bitsig{ (hi_sig << 64) | lo_sig };
-    file_P_sig << bitsig << "\t " << (it_P->second).P_D_s << "\t " << (it_P->second).P_MCM << endl;
+    file_P_sig << int_to_bstring((it_P->first), r) << "\t " << (it_P->second).P_D_s << "\t " << (it_P->second).P_MCM << endl;
   }
 
   file_P_sig.close();
@@ -156,8 +175,7 @@ void PrintFile_StateProbabilites_NewBasis(map<__int128_t, unsigned int > Kset, m
 
 __int128_t transform_mu_basis(__int128_t mu, list<__int128_t> basis);
 
-
-map<__int128_t, Proba> P_s(map<__int128_t, unsigned int> Nset, list<__int128_t> Basis, map<unsigned int, __int128_t> Partition, unsigned int N) // Probabilities in the sigma basis
+map<__int128_t, Proba> P_s(map<__int128_t, unsigned int> Nset, list<__int128_t> Basis, map<unsigned int, __int128_t> Partition, unsigned int N, unsigned int r) // Probabilities in the sigma basis
 {
   double Nd = (double) N;
 
@@ -193,7 +211,7 @@ map<__int128_t, Proba> P_s(map<__int128_t, unsigned int> Nset, list<__int128_t> 
 
   // Compute the model probability of the MCM based on Kset using "Partition":
     cout << "--->> Compute P[s] for the chosen MCM..." << endl << endl;
-    map<__int128_t, Proba> all_P_sig = P_sig(Kset, Partition, N);   // Compute P[s] for the MCM in the new basis
+    map<__int128_t, Proba> all_P_sig = P_sig(Kset, Partition, N, r);   // Compute P[s] for the MCM in the new basis
 
   // Report the values of P_MCM in the original all_P:
     map<__int128_t, Proba>::iterator it_P;
@@ -211,25 +229,21 @@ map<__int128_t, Proba> P_s(map<__int128_t, unsigned int> Nset, list<__int128_t> 
   return all_P;  
 }
 
-
 /******************************************************************************/
 /*****************      PRINT FILE: INFO about an MCM     *********************/
 /******************************************************************************/
 
-void PrintFile_MCM_Info(list<__int128_t> Basis, map<unsigned int, __int128_t> MCM_Partition, string filename = "Result")
+void PrintFile_MCM_Info(list<__int128_t> Basis, map<unsigned int, __int128_t> MCM_Partition, unsigned int r, string filename = "Result")
 {
   //***** PRINT BASIS: 
-  fstream file_MCM_info((OUTPUT_directory + filename + "_MCM_info.dat"), ios::out);
+  //fstream file_MCM_info((OUTPUT_directory + filename + "_MCM_info.dat"), ios::out);
+  fstream file_MCM_info(OutputFile_Add_Location(filename + "_MCM_info.dat"), ios::out);
 
   file_MCM_info << "## sig_vec = states in the chosen new basis (ideally the best basis), defined by the basis operators:" << endl;
   int i = 1;
   for (list<__int128_t>::iterator it = Basis.begin(); it != Basis.end(); it++)
   {
-    bitset<n> hi_sig{ static_cast<unsigned long long>((*it) >> 64) },
-            lo_sig{ static_cast<unsigned long long>(*it) },
-            bitsig{ (hi_sig << 64) | lo_sig };
-
-    file_MCM_info << "##\t sig_" << i << " = " << bitsig << endl; i++;
+    file_MCM_info << "##\t sig_" << i << " = " << int_to_bstring((*it), r) << endl; i++;
   } file_MCM_info << "##" << endl;
 
   // Print info about the model -- Print MCM:
@@ -241,33 +255,26 @@ void PrintFile_MCM_Info(list<__int128_t> Basis, map<unsigned int, __int128_t> MC
   {    
     __int128_t Part = (*it).second;
 
-    bitset<n> hi_Part{ static_cast<unsigned long long>(Part >> 64) },
-            lo_Part{ static_cast<unsigned long long>(Part) },
-            bit_Part{ (hi_Part << 64) | lo_Part };
-
-    file_MCM_info << "##\t MCM_Part_" << i << " = " << bit_Part << endl; i++;
+    file_MCM_info << "##\t MCM_Part_" << i << " = " << int_to_bstring(Part, r) << endl; i++;
   }
   file_MCM_info << "##" << endl;
 
   file_MCM_info.close();
 }
 
-
 /******************************************************************************/
 /*************      Print the model probabilities in a file     ***************/
 /******************************************************************************/
-unsigned int count_bits(__int128_t bool_nb);
-
-void PrintFile_StateProbabilites_OriginalBasis(map<__int128_t, unsigned int > Nset, list<__int128_t> Basis, map<unsigned int, __int128_t> MCM_Partition, unsigned int N, string filename = "Result")
+void PrintFile_StateProbabilites_OriginalBasis(map<__int128_t, unsigned int > Nset, list<__int128_t> Basis, map<unsigned int, __int128_t> MCM_Partition, unsigned int N, unsigned int r, string filename = "Result")
 {
   // Compute all the state probabilities:
-  map<__int128_t, Proba> P_all = P_s(Nset, Basis, MCM_Partition, N);
+  map<__int128_t, Proba> P_all = P_s(Nset, Basis, MCM_Partition, N, r);
 
-  double *Pk_D = (double *)malloc((n+1)*sizeof(double)); 
-  double *Pk_MCM = (double *)malloc((n+1)*sizeof(double)); 
+  double *Pk_D = (double *)malloc((r+1)*sizeof(double)); 
+  double *Pk_MCM = (double *)malloc((r+1)*sizeof(double)); 
 
   unsigned int k = 0;
-  for(k=0; k<=n; k++)
+  for(k=0; k<=r; k++)
   {
     Pk_D[k] = 0;
     Pk_MCM[k] = 0;
@@ -281,11 +288,12 @@ void PrintFile_StateProbabilites_OriginalBasis(map<__int128_t, unsigned int > Ns
   cout << "--->> Print the probability of a state with k \'+1\' bits: \'" << Pk_filename << "\'" << endl << endl;
 
   //***** Print info about the model -- Print Basis and MCM:  **************/
-  PrintFile_MCM_Info(Basis, MCM_Partition, filename);
+  PrintFile_MCM_Info(Basis, MCM_Partition, r, filename);
 
   //***** Print P(s):  *****************************************************/
   __int128_t s;
-  fstream file_Ps((OUTPUT_directory + Ps_filename), ios::out);
+  //fstream file_Ps((OUTPUT_directory + Ps_filename), ios::out);
+  fstream file_Ps(OutputFile_Add_Location(Ps_filename), ios::out);
 
   file_Ps << "## s = states in the original basis" << endl;
   file_Ps << "## sig = states in the chosen new basis (ideally the best basis)" << endl;
@@ -298,32 +306,26 @@ void PrintFile_StateProbabilites_OriginalBasis(map<__int128_t, unsigned int > Ns
   for (map<__int128_t, Proba>::iterator it_P = P_all.begin(); it_P!=P_all.end(); ++it_P)
   {   
     s = it_P->first;
-        
-    bitset<n> hi_s{ static_cast<unsigned long long>(s >> 64) },
-            lo_s{ static_cast<unsigned long long>(s) },
-            bits{ (hi_s << 64) | lo_s };
+    
+    file_Ps << int_to_bstring(s, r) << "\t" <<  (it_P->second).P_D_s << "\t" << (it_P->second).P_MCM << "\t" << int_to_bstring((it_P->second).sig, r) << endl;
 
-    bitset<n> hi_sig{ static_cast<unsigned long long>(((it_P->second).sig) >> 64) },
-            lo_sig{ static_cast<unsigned long long>(((it_P->second).sig)) },
-            bitsig{ (hi_sig << 64) | lo_sig };
-
-    file_Ps << bits << "\t" <<  (it_P->second).P_D_s << "\t" << (it_P->second).P_MCM << "\t" << bitsig << endl;
-    //file_Ps << bitset<n>(s) << "\t" <<  (it_P->second).P_D_s << "\t" << (it_P->second).P_MCM << "\t" << bitset<n>((it_P->second).sig) << endl;
-
-    k = count_bits(s); //bitset<n>(s).count();
+    k = Bitset_count(s);
     Pk_D[k] += (it_P->second).P_D_s;      // P[k] in the data
     Pk_MCM[k] += (it_P->second).P_MCM;    // P[k] from the MCM
   }
   file_Ps.close();
 
   //***** Print P(k):   ***************************************************/
-  fstream file_Pk((OUTPUT_directory + Pk_filename), ios::out);
+  //fstream file_Pk((OUTPUT_directory + Pk_filename), ios::out);
+  fstream file_Pk(OutputFile_Add_Location(Pk_filename), ios::out);
 
   file_Pk << "## 1:k \t 2:P_D(k) \t 3:P_MCM(k)" << endl;
 
-  for(k=0; k<=n; k++)
+  for(k=0; k<=r; k++)
   {
     file_Pk << k << "\t" << Pk_D[k] << "\t" << Pk_MCM[k] << endl;
   }
   file_Pk.close();
 }
+
+

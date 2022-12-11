@@ -1,13 +1,26 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
+#include <string>
 #include <list>
-#include <bitset>
+
+using namespace std;
 
 /********************************************************************/
 /**************************    CONSTANTS    *************************/
 /********************************************************************/
-#include "data.h"
+// INPUT BASIS FILES (optional):
+// const string basis_IntegerRepresentation_filename = "INPUT/SCOTUS_n9_BestBasis_Integer.dat";        // (optional) Input basis file 
+// const string basis_BinaryRepresentation_filename = "INPUT/SCOTUS_n9_BestBasis_Binary.dat";      // (optional) Input basis file
+
+/******************************************************************************/
+/***************************   Constant variables   ***************************/
+/******************************************************************************/
+const __int128_t un = 1;
+
+/******************************************************************************/
+/******************   TOOL Functions from "tools.cpp"   ***********************/
+/******************************************************************************/
+string int_to_bstring(__int128_t bool_nb, unsigned int n);
 
 /******************************************************************************/
 /*****************   Read Basis Operators from file  **************************/
@@ -30,7 +43,7 @@
 /*** VERSION a) Operators are written as the binary          ******************/
 /****           representation of the interactions           ******************/
 /******************************************************************************/
-list<__int128_t> Read_BasisOp_BinaryRepresentation(string Basis_binary_filename = basis_BinaryRepresentation_filename)
+list<__int128_t> Read_BasisOp_BinaryRepresentation(unsigned int r, string Basis_binary_filename) //string Basis_binary_filename = basis_BinaryRepresentation_filename)
 {
   __int128_t Op_bit = 0, Op = 0;
   list<__int128_t> Basis_li;
@@ -43,10 +56,10 @@ list<__int128_t> Read_BasisOp_BinaryRepresentation(string Basis_binary_filename 
   {
     while ( getline (myfile,line))
     {
-      line2 = line.substr (0,n);          //take the n first characters of line
+      line2 = line.substr (0,r);          //take the r first characters of line
 
       //convert string line2 into a binary integer:
-      Op_bit = un << (n - 1);
+      Op_bit = un << (r - 1);
       Op = 0;
       for (auto &elem: line2)
       {
@@ -66,7 +79,7 @@ list<__int128_t> Read_BasisOp_BinaryRepresentation(string Basis_binary_filename 
 /*** VERSION b) Operators are written as the integer values of the binary *****/
 /****           representation of the interactions           ******************/
 /******************************************************************************/
-list<__int128_t> Read_BasisOp_IntegerRepresentation(string Basis_integer_filename = basis_IntegerRepresentation_filename)
+list<__int128_t> Read_BasisOp_IntegerRepresentation(string Basis_integer_filename) //string Basis_integer_filename = basis_IntegerRepresentation_filename)
 {
   __int128_t Op = 0;
   list<__int128_t> Basis_li;
@@ -90,12 +103,12 @@ list<__int128_t> Read_BasisOp_IntegerRepresentation(string Basis_integer_filenam
 /******************************************************************************/
 /*************************    Original Basis     ******************************/
 /******************************************************************************/
-list<__int128_t> Original_Basis()
+list<__int128_t> Original_Basis(unsigned int r)
 {
   __int128_t Op = 1;
   list<__int128_t> Basis_li;
 
-  for (int i=0; i<n; i++)
+  for (int i=0; i<r; i++)
   {
     Basis_li.push_back(Op);
     Op = Op << 1;
@@ -107,16 +120,15 @@ list<__int128_t> Original_Basis()
 /******************************************************************************/
 /***************************    Print Basis     *******************************/
 /******************************************************************************/
-void PrintTerm_Basis(list<__int128_t> Basis_li)
+void PrintTerm_Basis(list<__int128_t> Basis_li, unsigned int r)
 {
   int i = 1;
   for (list<__int128_t>::iterator it = Basis_li.begin(); it != Basis_li.end(); it++)
   {
-    bitset<n> hi{ static_cast<unsigned long long>((*it) >> 64) },
-            lo{ static_cast<unsigned long long>((*it)) },
-            bits{ (hi << 64) | lo };
-    cout << "##\t " << i << " \t " << bits << endl; i++;
+    cout << "##\t " << i << " \t " << int_to_bstring((*it), r) << endl; i++;
   } 
   cout << "##" << endl;
 }
+
+
 

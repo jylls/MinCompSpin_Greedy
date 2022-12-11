@@ -1,11 +1,13 @@
-#define _USE_MATH_DEFINES
-#include <bitset>
+#include <iostream>
 #include <cmath>       /* tgamma */
 #include <map>
 
 using namespace std;
 
-#include "data.h"
+/******************************************************************************/
+/******************   TOOL Functions from "tools.cpp"   ***********************/
+/******************************************************************************/
+unsigned int Bitset_count(__int128_t bool_nb);
 
 /******************************************************************************/
 /**************** Log-likelihood (LogL) of a complete model  ******************/
@@ -42,7 +44,7 @@ double LogL_CM(map<__int128_t, unsigned int > Kset, unsigned int N)
 // This function could be also used directly by the user
 // to compute the log-likelihood of a sub-complete model
 
-double LogL_SubCM(map<__int128_t, unsigned int> Kset, __int128_t Ai, unsigned int N, bool print_bool = false)
+double LogL_SubCM(map<__int128_t, unsigned int> Kset, __int128_t Ai, unsigned int N)
 {
   map<__int128_t, unsigned int>::iterator it;
   map<__int128_t, unsigned int > Kset_new;
@@ -50,24 +52,16 @@ double LogL_SubCM(map<__int128_t, unsigned int> Kset, __int128_t Ai, unsigned in
   __int128_t s;        // state
   unsigned int ks=0; // number of time state s appear in the dataset
 
-  if (print_bool)  { 
-  cout << endl << "--->> Build Kset for SC Model based on "  << bitset<n>(Ai) << " for MCM.." << endl;
-  }
 //Build Kset_new:
   for (it = Kset.begin(); it!=Kset.end(); ++it)
   {
     s = it->first;      // initial state s 
     ks = it->second;    // # of times s appears in the data set
-    if (print_bool)  {  cout << bitset<n>(s) << " \t" ;  }
 
     s &= Ai;   // troncated state: take only the bits indicated by Ai
-//    sig_m = bitset<m>(bitset<m>(mu).to_string()).to_ulong(); //bitset<m>(mu).to_ulong(); // mu|m
-    if (print_bool)  {  cout << bitset<n>(s) << endl; }
 
     Kset_new[s] += ks;
-    //Kset[mu_m].second.push_back(make_pair(mu, N_mu));
   }
-  if (print_bool)  {  cout << endl;  }
 
   return LogL_CM(Kset_new, N);
 }
@@ -80,8 +74,7 @@ double LogL_SubCM(map<__int128_t, unsigned int> Kset, __int128_t Ai, unsigned in
 // i.e., that each basis element only appears in a single part of the partition.
 //bool check_partition(map<uint32_t, uint32_t> Partition);
 
-double LogL_MCM(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t> Partition, unsigned int N, unsigned int r = n, bool print_bool = false)
-//double LogL_MCM(map<uint32_t, unsigned int > Kset, map<uint32_t, uint32_t> Partition, unsigned int N, bool print_bool = false)
+double LogL_MCM(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t> Partition, unsigned int N, unsigned int r)
 {
   //if (!check_partition(Partition)) {cout << "Error, the argument is not a partition." << endl; return 0;  }
 
@@ -93,14 +86,10 @@ double LogL_MCM(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t
 
     for (Part = Partition.begin(); Part != Partition.end(); Part++)
     {
-        bitset<n> hi{ static_cast<unsigned long long>((*Part).second >> 64) },
-            lo{ static_cast<unsigned long long>((*Part).second) },
-            bits{ (hi << 64) | lo };
         LogL += LogL_SubCM(Kset, (*Part).second, N);
-        rank += bits.count();
+        rank += Bitset_count((*Part).second);
     }  
-    return LogL - ((double) (N * (n-rank))) * log(2.);
+    return LogL - ((double) (N * (r-rank))) * log(2.);
   //}
 }
-
 

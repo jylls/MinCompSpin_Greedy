@@ -1,7 +1,7 @@
+#include <iostream>
 #include <map>
 #include <list>
-#include <fstream>
-#include <sstream>
+#include <string>
 #include <ctime> // for chrono
 #include <ratio> // for chrono
 #include <chrono> // for chrono
@@ -12,15 +12,14 @@ using namespace std::chrono;
 /******************************************************************************/
 /**********************    CONSTANTS AND FUNCTIONS    *************************/
 /******************************************************************************/
-#include "data.h"
-#include "library.h"
+//#include "library.hpp"
 
 /******************************************************************************/
 /**********************   ROUTINES for GREEDY SEARCH   ************************/
 /******************************************************************************/
-map<unsigned int, __int128_t> MCM_GreedySearch(map<__int128_t, unsigned int> Kset, unsigned int N, unsigned int r = n);
+map<unsigned int, __int128_t> MCM_GreedySearch(map<__int128_t, unsigned int> Kset, unsigned int N, unsigned int r);
 
-map<unsigned int, __int128_t> MCM_GreedySearch_AND_printInfo(map<__int128_t, unsigned int> Kset, unsigned int N, unsigned int r = n)
+map<unsigned int, __int128_t> MCM_GreedySearch_AND_printInfo(map<__int128_t, unsigned int> Kset, unsigned int N, unsigned int r)
 {
     cout << "######### START GREEDY SEARCH #########" << endl;
     // *** Calculate the optimal partition
@@ -34,16 +33,16 @@ map<unsigned int, __int128_t> MCM_GreedySearch_AND_printInfo(map<__int128_t, uns
     cout << "######### EMPERICAL #########" << endl;
     // Entropy of dataset
     double H = Entropy(Kset, N);
-    cout << "H : " << H << ". Range: [0, " << n << "]" << endl << endl;
+    cout << "H : " << H << ". Range: [0, " << r << "]" << endl << endl;
 
     cout << "#########  GREEDY   #########" << endl;
     // Log evidence of MCM
-    double LE_g = LogE_MCM(Kset, fp1, N);
-    Print_MCM_Partition(fp1);
+    double LE_g = LogE_MCM(Kset, fp1, N, r);
+    Print_MCM_Partition(fp1, r);
 
     cout << "Elapsed time      : " << elapsed.count() << "s" << endl;
     cout << "Log-evidence      : " << LE_g << endl;
-    cout << "Average comm size : " << (double)n / (double)fp1.size() << endl << endl;
+    cout << "Average comm size : " << (double)r / (double)fp1.size() << endl << endl;
 
     return fp1;
 }
@@ -51,21 +50,21 @@ map<unsigned int, __int128_t> MCM_GreedySearch_AND_printInfo(map<__int128_t, uns
 /******************************************************************************/
 /********************   GREEDY SEARCH in ORIGINAL BASIS   *********************/
 /******************************************************************************/
-map<unsigned int, __int128_t> MCM_GreedySearch_OriginalBasis(map<__int128_t, unsigned int> Nset, unsigned int N)
+map<unsigned int, __int128_t> MCM_GreedySearch_OriginalBasis(map<__int128_t, unsigned int> Nset, unsigned int N, unsigned int r)
 {
-    return MCM_GreedySearch(Nset, N, n);
+    return MCM_GreedySearch(Nset, N, r);
 }
 
 map<unsigned int, __int128_t> MCM_GreedySearch_ChosenBasis(map<__int128_t, unsigned int> Nset, unsigned int N, list<__int128_t> Basis_li)
 {
-    map<__int128_t, unsigned int> Kset = build_Kset(Nset, Basis_li, false);
+    map<__int128_t, unsigned int> Kset = build_Kset(Nset, Basis_li);
     return MCM_GreedySearch(Kset, N, Basis_li.size());
 }
 
 /******************************************************************************/
 /********************   GREEDY SEARCH for REDUCED DATASET  ********************/
 /******************************************************************************/
-map<unsigned int, __int128_t> MCM_ReducedGreedySearch_AND_PrintInfo(map<__int128_t, unsigned int> Kset, unsigned int K, unsigned int N, unsigned int r = n)
+map<unsigned int, __int128_t> MCM_ReducedGreedySearch_AND_PrintInfo(map<__int128_t, unsigned int> Kset, unsigned int K, unsigned int N, unsigned int r)
 {
     unsigned int N_reduced = N;
     map<__int128_t, unsigned int> Kset_reduced = Kset;
@@ -89,18 +88,18 @@ map<unsigned int, __int128_t> MCM_ReducedGreedySearch_AND_PrintInfo(map<__int128
     cout << "######### EMPERICAL #########" << endl;
     // Entropy of dataset
     double H = Entropy(Kset_reduced, N_reduced);
-    cout << "Entropy, H : " << H << ". Range: [0, " << n << "]" << endl << endl;
+    cout << "Entropy, H : " << H << ". Range: [0, " << r << "]" << endl << endl;
 
     cout << "#########  MCM GREEDY INFO  #########" << endl;
     // Log evidence of MCM
-    double LE_reduced = LogE_MCM(Kset_reduced, fp_reduced, N_reduced);
-    double LE = LogE_MCM(Kset, fp_reduced, N);
-    Print_MCM_Partition(fp_reduced);
+    double LE_reduced = LogE_MCM(Kset_reduced, fp_reduced, N_reduced, r);
+    double LE = LogE_MCM(Kset, fp_reduced, N, r);
+    Print_MCM_Partition(fp_reduced, r);
 
     cout << "Elapsed time      : " << elapsed.count() << "s" << endl;
     cout << "Log-evidence reduced     : " << LE_reduced << endl;
     cout << "Log-evidence original data     : " << LE << endl;
-    cout << "Average comm size : " << (double)n / (double)fp_reduced.size() << endl << endl;
+    cout << "Average comm size : " << (double)r / (double)fp_reduced.size() << endl << endl;
 
     Kset_reduced.clear();
 
@@ -110,18 +109,18 @@ map<unsigned int, __int128_t> MCM_ReducedGreedySearch_AND_PrintInfo(map<__int128
 /******************************************************************************/
 /*************************   READING MCM from a FILE   ************************/
 /******************************************************************************/
-map<unsigned int, __int128_t> read_MCM_fromfile(string Input_MCM_file = communityfile);
+map<unsigned int, __int128_t> read_MCM_fromfile(string Input_MCM_file, unsigned int r);
 
-map<unsigned int, __int128_t> read_MCM_fromfile_AND_printInfo(map<__int128_t, unsigned int> Kset, unsigned int N, string Input_MCM_file = communityfile)
+map<unsigned int, __int128_t> read_MCM_fromfile_AND_printInfo(map<__int128_t, unsigned int> Kset, unsigned int N, string Input_MCM_file, unsigned int r)
 {
     cout << "#########  THEORETICAL   #########" << endl;
-    map<unsigned int, __int128_t> fp2 = read_MCM_fromfile(Input_MCM_file);
+    map<unsigned int, __int128_t> fp2 = read_MCM_fromfile(Input_MCM_file, r);
 
-    double LE_t = LogE_MCM(Kset, fp2, N);
-    Print_MCM_Partition(fp2);
+    double LE_t = LogE_MCM(Kset, fp2, N, r);
+    Print_MCM_Partition(fp2, r);
 
     cout << "Log-evidence      : " << LE_t << endl;
-    cout << "Average comm size : " << (double)n / (double)fp2.size() << endl << endl;
+    cout << "Average comm size : " << (double)r / (double)fp2.size() << endl << endl;
 
     return fp2;
 }
@@ -129,15 +128,15 @@ map<unsigned int, __int128_t> read_MCM_fromfile_AND_printInfo(map<__int128_t, un
 /******************************************************************************/
 /****************************   COMPARING TWO MCMs   **************************/
 /******************************************************************************/
-void compare_two_MCMs_AND_printInfo(map<__int128_t, unsigned int> Kset, unsigned int N, map<unsigned int, __int128_t> fp1, map<unsigned int, __int128_t> fp2)
+void compare_two_MCMs_AND_printInfo(map<__int128_t, unsigned int> Kset, unsigned int N, unsigned int r, map<unsigned int, __int128_t> fp1, map<unsigned int, __int128_t> fp2)
 {
     cout << "#########  COMPARATIVE MEASURES   #########" << endl;
-    double VOI = Var_of_Inf(fp1, fp2);
-    double NMI = Norm_Mut_info(fp1, fp2);
+    double VOI = Var_of_Inf(fp1, fp2, r);
+    double NMI = Norm_Mut_info(fp1, fp2, r);
     string istrue = is_subset(fp1, fp2) ? "Yes" : "No";
 
-    double LE_1 = LogE_MCM(Kset, fp1, N);
-    double LE_2 = LogE_MCM(Kset, fp2, N);
+    double LE_1 = LogE_MCM(Kset, fp1, N, r);
+    double LE_2 = LogE_MCM(Kset, fp2, N, r);
 
     cout << "Is MCM_1 \'subset\' of MCM_2    : " << istrue << endl;
     cout << "Variation of Information      : " << VOI << endl;

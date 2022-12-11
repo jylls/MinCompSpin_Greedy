@@ -1,27 +1,43 @@
-#define _USE_MATH_DEFINES
 #include <iostream>
-#include <vector>
 #include <fstream>
-#include <sstream>
+#include <string>
 #include <list>
-#include <bitset>
 #include <map>
-#include <cstring>
+//#include <cstring>
+
+using namespace std;
 
 /********************************************************************/
 /**************************    CONSTANTS    *************************/
 /********************************************************************/
-#include "data.h"
+// number of binary (spin) variables:
+// const unsigned int n = 9;  
+
+// INPUT DATA FILES (optional):  
+// the input datafile can also be specified directly in the main() function, as an argument of the function "read_datafile()":
+// const string datafilename = "INPUT/SCOTUS_n9_N895_Data.dat"; //"INPUT/sampled.dat";
+
+/******************************************************************************/
+/***************************   Constant variables   ***************************/
+/******************************************************************************/
+const __int128_t un = 1;
+
+/******************************************************************************/
+/******************   TOOL Functions from "tools.cpp"   ***********************/
+/******************************************************************************/
+string int_to_bstring(__int128_t bool_nb, unsigned int n);
+unsigned int Bitset_count(__int128_t bool_nb);
 
 /******************************************************************************/
 /***********************     READ DATA FILE    ********************************/
 /******************************************************************************/
 /**************    READ DATA and STORE them in Nset    ************************/
-map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file = datafilename)    // O(N)  where N = data set size
+//map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file = datafilename, unsigned int r=n)
+map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file, unsigned int r)    // O(N)  where N = data set size
 {
     string line, line2;     char c = '1';
     __int128_t nb = 0, Op;
-    (*N) = 0;            // N = dataset size
+    (*N) = 0;            // N = dataset sizes
     //cout << endl << "--->> Read \"" << datafilename << "\",\t Build Nset...";
 
 // ***** data are store in Nset:  ********************************
@@ -32,8 +48,8 @@ map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file = dataf
     {
         while ( getline (myfile,line))
         {
-            line2 = line.substr (0,n);          //take the n first characters of line
-            Op = un << (n - 1);
+            line2 = line.substr (0,r);          //take the r first characters of line
+            Op = un << (r - 1);
             nb = 0;
             for (auto &elem: line2)     //convert string line2 into a binary integer
             {
@@ -41,7 +57,7 @@ map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file = dataf
                 Op = Op >> 1;
             }
             Nset[nb] += 1;
-            //cout << line << endl;   //cout << nb << " :  " << bitset<n>(nb) << endl;
+            //cout << line << endl;   //cout << nb << " :  " << int_to_bstring(nb, r) << endl;
             (*N)++;
         }
         myfile.close();
@@ -58,7 +74,7 @@ map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file = dataf
 /******************************************************************************/
 /**************************     PRINT Nset   **********************************/
 /******************************************************************************/
-void Print_File_Nset(map<__int128_t, unsigned int> Nset, unsigned int N, string OUTPUTfilename)
+void Print_File_Nset(map<__int128_t, unsigned int> Nset, unsigned int N, unsigned int r, string OUTPUTfilename)
 // map.second = nb of time that the state map.first appears in the data set
 {
   map<__int128_t, unsigned int>::iterator it;
@@ -67,14 +83,14 @@ void Print_File_Nset(map<__int128_t, unsigned int> Nset, unsigned int N, string 
 
   fstream file(OUTPUTfilename.c_str(), ios::out);
   file << "#N = " << N << endl;
-  file << "#Total number of accessible states = 2^(" << n << ") - 1" << endl;
+  file << "#Total number of accessible states = 2^r-1 = 2^(" << r << ") - 1" << endl;
   file << "#Number of visited states, Nset.size() = " << Nset.size() << endl;
   file << "#" << endl;
   file << "#1: state \t #2: nb of pts in state \t #3: Pba state" << endl;
 
   for (it = Nset.begin(); it!=Nset.end(); ++it)
   {
-    file << bitset<n>((*it).first) << " => " << (*it).second; // << endl;
+    file << int_to_bstring((*it).first, r) << " => " << (*it).second; // << endl;
     file << "  \t  P = " << ((*it).second) / (float) N << endl;
     Ncontrol += (*it).second;
   }
@@ -99,11 +115,14 @@ __int128_t transform_mu_basis(__int128_t mu, list<__int128_t> basis)
   for(phi_i = basis.begin(); phi_i != basis.end(); ++phi_i)
   {
     proj = (*phi_i) & mu;
+    /*
     bitset<n> hi{ static_cast<unsigned long long>(proj >> 64) },
             lo{ static_cast<unsigned long long>(proj) },
             bits{ (hi << 64) | lo };
 
-    if ( (bits.count() % 2) == 1) // odd number of 1, i.e. sig_i = 1
+    if ( (bits.count() % 2) == 1)
+    */
+    if ( (Bitset_count(proj) % 2) == 1) // odd number of 1, i.e. sig_i = 1
     {
       final_mu += un_i;
     }
@@ -119,7 +138,7 @@ __int128_t transform_mu_basis(__int128_t mu, list<__int128_t> basis)
 // Build Kset for the states written in the basis of the m-chosen independent 
 // operator on which the SC model is based:
 
-map<__int128_t, unsigned int> build_Kset(map<__int128_t, unsigned int> Nset, list<__int128_t> Basis, bool print_bool=false)
+map<__int128_t, unsigned int> build_Kset(map<__int128_t, unsigned int> Nset, list<__int128_t> Basis) //, bool print_bool=false)
 // sig_m = sig in the new basis and cut on the m first spins 
 // Kset[sig_m] = #of time state mu_m appears in the data set
 {
@@ -139,17 +158,14 @@ map<__int128_t, unsigned int> build_Kset(map<__int128_t, unsigned int> Nset, lis
       s = it->first;       // state s
       ks = it->second;    // # of times s appears in the data set
       sig_m = transform_mu_basis(s, Basis);
-      //    sig_m = bitset<m>(bitset<m>(mu).to_string()).to_ulong(); //bitset<m>(mu).to_ulong(); // mu|m
-      if (print_bool)  {  cout << bitset<n>(s) << " \t" << ": \t" << bitset<n>(sig_m) << endl; }
+      //if (print_bool)  {  cout << int_to_bstring(s, n) << " \t" << ": \t" << int_to_bstring(sig_m, n) << endl; }
 
       Kset[sig_m] += ks;
-      //Kset[mu_m].second.push_back(make_pair(mu, N_mu));
   }
   cout << endl;
 
   return Kset;
 }
-
 
 /******************************************************************************/
 /****************************   REDUCE K_SET   ********************************/

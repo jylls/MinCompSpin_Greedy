@@ -1,12 +1,14 @@
+#include <iostream>
 #include <cmath>
 #include <map>
-#include <bitset>
-#include <list>
-#include <numeric>
+#include <numeric>  // for accumulate()
 
 using namespace std;
 
-#include "data.h"
+/******************************************************************************/
+/******************   TOOL Functions from "tools.cpp"   ***********************/
+/******************************************************************************/
+unsigned int Bitset_count(__int128_t bool_nb);
 
 /******************************************************************************/
 /**************************    Check sub-MCM:   *******************************/
@@ -34,7 +36,7 @@ bool is_subset(map<unsigned int, __int128_t> fp1, map<unsigned int, __int128_t> 
 }
 
 
-double Entropy(map <__int128_t, unsigned int> Kset, unsigned int N)
+double Entropy(map<__int128_t, unsigned int> Kset, unsigned int N)
 {
     // Entropy of emperical data
     double H = 0;
@@ -64,10 +66,10 @@ map<__int128_t, double> cartesianProd(map<__int128_t, double> Map1, map<__int128
     return Prod;
 }
 
-map<__int128_t, double> emp_dist(map<__int128_t, unsigned int> Kset, unsigned int N)
+map<__int128_t, double> emp_dist(map<__int128_t, unsigned int> Kset, unsigned int N, unsigned int r)
 {
     map<__int128_t, double> EMP;
-    if (n > 20)
+    if (r > 20)
     {
         return EMP;
     }
@@ -78,7 +80,7 @@ map<__int128_t, double> emp_dist(map<__int128_t, unsigned int> Kset, unsigned in
     return EMP;
 }
 
-map<__int128_t, double> MCM_distr(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t> Partition, unsigned int N)
+map<__int128_t, double> MCM_distr(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t> Partition, unsigned int N, unsigned int r)
 {
     map<__int128_t, map<__int128_t, double>> sub_distr;
     map<__int128_t, double> distr;
@@ -89,7 +91,7 @@ map<__int128_t, double> MCM_distr(map<__int128_t, unsigned int> Kset, map<unsign
     __int128_t Ai, s;
     unsigned int ks, tot_size = 1;
 
-    if (n > 20) { cout << "Too many nodes! JSD is unreliable!" << endl << endl; return distr; }
+    if (r > 20) { cout << "Too many nodes! JSD is unreliable!" << endl << endl; return distr; }
 
     for (auto& comm : Partition)
     {
@@ -124,7 +126,7 @@ map<__int128_t, double> MCM_distr(map<__int128_t, unsigned int> Kset, map<unsign
     return distr;
 }
 
-double Kullback_Leibler(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t> Partition, unsigned int N)
+double KL_divergence(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t> Partition, unsigned int N)
 {
     map<__int128_t, double> distr;
     map<__int128_t, unsigned int> Kset_new;
@@ -219,7 +221,7 @@ double JS_divergence(map<__int128_t, double> Prob1, map<__int128_t, double> Prob
     return jsd / 2.0;
 }
 
-double Norm_Mut_info(map<unsigned int, __int128_t> Partition1, map<unsigned int, __int128_t> Partition2)
+double Norm_Mut_info(map<unsigned int, __int128_t> Partition1, map<unsigned int, __int128_t> Partition2, unsigned int r)
 {
     double I, H, p1, p2, p12;
     I = 0;  H = 0;
@@ -228,12 +230,16 @@ double Norm_Mut_info(map<unsigned int, __int128_t> Partition1, map<unsigned int,
     map<unsigned int, __int128_t>::iterator com1, com2;
     for (com1 = Partition1.begin(); com1 != Partition1.end(); com1++)
     {
+        /*
         bitset<n> hi1{ static_cast<unsigned long long>((*com1).second >> 64) },
             lo1{ static_cast<unsigned long long>((*com1).second) },
             bits1{ (hi1 << 64) | lo1 };
         p1 = (double)bits1.count() / (double)(n);
+        */
+        p1 = (double)(Bitset_count((*com1).second)) / (double)(r);
         for (com2 = Partition2.begin(); com2 != Partition2.end(); com2++)
         {
+            /*
             bitset<n> hi2{ static_cast<unsigned long long>((*com2).second >> 64) },
                 lo2{ static_cast<unsigned long long>((*com2).second) },
                 bits2{ (hi2 << 64) | lo2 };
@@ -244,6 +250,10 @@ double Norm_Mut_info(map<unsigned int, __int128_t> Partition1, map<unsigned int,
 
             p2 = (double)bits2.count() / (double)(n);
             p12 = (double)bits12.count() / (double)(n);
+            */
+            p2 = (double)(Bitset_count((*com2).second)) / (double)(r);
+            p12 = (double)(Bitset_count( (*com1).second & (*com2).second )) / (double)(r);            
+
             if (p12 != 0)
             {
                 I += p12 * log(p12 / (p1 * p2));
@@ -256,7 +266,7 @@ double Norm_Mut_info(map<unsigned int, __int128_t> Partition1, map<unsigned int,
     else { return -2 * I / H; }
 }
 
-double Var_of_Inf(map<unsigned int, __int128_t> Partition1, map<unsigned int, __int128_t> Partition2)
+double Var_of_Inf(map<unsigned int, __int128_t> Partition1, map<unsigned int, __int128_t> Partition2, unsigned int r)
 {
     // Variation of information calculates the distance between two partitions. The regular variation of information
     // is equal to the joint entropy minus the mutual information. However, the normalized version (divide by the joint entropy)
@@ -267,12 +277,16 @@ double Var_of_Inf(map<unsigned int, __int128_t> Partition1, map<unsigned int, __
     map<unsigned int, __int128_t>::iterator com1, com2;
     for (com1 = Partition1.begin(); com1 != Partition1.end(); com1++)
     {
-        bitset<n> hi1{ static_cast<unsigned long long>((*com1).second >> 64) },
+        /*bitset<n> hi1{ static_cast<unsigned long long>((*com1).second >> 64) },
             lo1{ static_cast<unsigned long long>((*com1).second) },
             bits1{ (hi1 << 64) | lo1 };
         p1 = (double)(bits1.count()) / (double)(n);
+        */
+        p1 = (double)(Bitset_count((*com1).second)) / (double)(r);
+
         for (com2 = Partition2.begin(); com2 != Partition2.end(); com2++)
         {
+            /*
             bitset<n> hi2{ static_cast<unsigned long long>((*com2).second >> 64) },
                 lo2{ static_cast<unsigned long long>((*com2).second) },
                 bits2{ (hi2 << 64) | lo2 };
@@ -283,7 +297,11 @@ double Var_of_Inf(map<unsigned int, __int128_t> Partition1, map<unsigned int, __
 
             p2 = (double)(bits2.count()) / (double)(n);
             p12 = (double)(bits12.count()) / (double)(n);
-            
+            */
+
+            p2 = (double)(Bitset_count((*com2).second)) / (double)(r);
+            p12 = (double)(Bitset_count( (*com1).second & (*com2).second )) / (double)(r);   
+
             if (p12 != 0)
             {
                 I += p12 * log(p12 / (p1 * p2));

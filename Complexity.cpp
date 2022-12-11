@@ -1,12 +1,12 @@
-#define _USE_MATH_DEFINES
-#include <bitset>
 #include <cmath>       /* tgamma */
 #include <map>
 
-using namespace std;
+//#define _USE_MATH_DEFINES
 
-#include "data.h"
-
+/******************************************************************************/
+/******************   TOOL Functions from "tools.cpp"   ***********************/
+/******************************************************************************/
+unsigned int Bitset_count(__int128_t bool_nb);
 
 /******************************************************************************/
 /**************************   MODEL COMPLEXITY   ******************************/
@@ -32,14 +32,14 @@ double ParamComplexity_SubCM(unsigned int m, unsigned int N)  // Parameter Compl
 // Compute separately: -- the first order complexity    --> stored in C_param
 //                     -- and the geometric complexity  --> stored in C_geom
 
-double Complexity_MCM(map<uint32_t, uint32_t> Partition, unsigned int N, double *C_param, double *C_geom)
+double Complexity_MCM(std::map<unsigned int, __int128_t> Partition, unsigned int N, double *C_param, double *C_geom)
 {
   *C_param = 0;   *C_geom = 0;
-  uint32_t m_i = 0;  // number of elements in Ai
+  unsigned int m_i = 0;  // number of elements in the i-th part "Ai"
 
-  for (map<uint32_t, uint32_t>::iterator Part = Partition.begin(); Part != Partition.end(); Part++)
+  for (std::map<unsigned int, __int128_t>::iterator Part = Partition.begin(); Part != Partition.end(); Part++)
   {
-    m_i = bitset<n>((*Part).second).count();
+    m_i = Bitset_count((*Part).second);
     (*C_param) += ParamComplexity_SubCM(m_i, N);
     (*C_geom) += GeomComplexity_SubCM(m_i);
   }  
