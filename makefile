@@ -10,8 +10,10 @@ n := 9		# number of binary variables in the datafile
 
 
 ########################################################################################################################
-#### TO COMPILE:  	Enter "make" in your terminal
-#### TO RUN: 		Enter "make run" in your terminal
+######## ENTER THE FOLLOWING IN YOUR TERMINAL:
+#### TO COMPILE:  	make
+#### TO RUN: 		make run
+#### TO CLEAN:      make clean    --> to use only when you are completely done
 ########################################################################################################################
 
 
