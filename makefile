@@ -13,7 +13,7 @@ n := 9		# number of binary variables in the datafile
 ######## ENTER THE FOLLOWING IN YOUR TERMINAL:
 #### TO COMPILE:  	make
 #### TO RUN: 		make run
-#### TO CLEAN:      make clean    --> to use only when you are completely done
+#### TO CLEAN:  	make clean    --> to use only when you are completely done
 ########################################################################################################################
 
 
