@@ -4,13 +4,11 @@
 This program allows to **find community structures in binary data**, taking into account possible **high order patterns** of data in the detection of the communities (i.e., possible high-order correlations between the variables). It is complementary to the program available [here](https://github.com/clelidm/MinCompSpin), which performs an exhaustive search for the best community. This program performs a greedy search for the best community, which is more appropriate for large systems (more than `15` spin variables).
 
 
-The idea of the algorithm is based on performing statistical inference with a family of spin models (maximum entropy models for binary data) that have minimal information theoretic complexity. These models are called Minimally Complex Models (MCM). Details can be found in Ref. [1].
-
-The idea of the algorithm is based on performing statistical inference with a family of spin models (maximum entropy models for binary data) with minimal information theoretic complexity. Details can be found in Ref. [1].
+The idea of the algorithm is based on performing statistical inference with a family of spin models (maximum entropy models for binary data) that have minimal information theoretic complexity. These models are called Minimally Complex Models (MCM). Details can be found in the paper [1] *Statistical Inference of Minimally Complex Models* available in [arXiv:2008.00520](https://arxiv.org/abs/2008.00520) 
 
 ----
 
-This repository contains a code developed for the paper Ref. [1] on *Statistical Inference of Minimally Complex Models* available in [arXiv:2008.00520](https://arxiv.org/abs/2008.00520). The code performs a greedy search for the best Minimally Complex Spin Model (MCM) on a basis provided by the user. This greedy approach is useful for systems with a large number of variables, `n > 15`. 
+This repository contains a code initially developed for the paper Ref. [1] on *Statistical Inference of Minimally Complex Models* and later optimised for the paper Ref.[2]. The code performs a greedy search for the best Minimally Complex Spin Model (MCM) on a basis provided by the user. This greedy approach is useful for systems with a large number of variables, `n > 15`. 
 
 The code performs an hierarchical merging procedure to find an optimal MCM on the basis provided by the user.
 
@@ -33,9 +31,11 @@ To efficiently generate all possible set partitions of these `r` operators, we u
 
 [1]  C. de Mulatier, P. P. Mazza, M. Marsili, *Statistical Inference of Minimally Complex Models*, [arXiv:2008.00520](https://arxiv.org/abs/2008.00520)
 
-[2]  Ehrlich, Gideon. *Loopless algorithms for generating permutations, combinations, and other combinatorial configurations.* Journal of the ACM (JACM) 20.3 (1973): 500-513.
+[2] S. Kamphof*, E. Peerbooms*, C. de Mulatier, *Statistical Modeling of Community Structures in Binary Data*
 
-[3]  D.E. Knuth, *The Art of Computer Programming*, Volume 4, Combinatorial Algorithms: Part 1.693 (Addison-Wesley Professional), (2011).
+[3]  Ehrlich, Gideon. *Loopless algorithms for generating permutations, combinations, and other combinatorial configurations.* Journal of the ACM (JACM) 20.3 (1973): 500-513.
+
+[4]  D.E. Knuth, *The Art of Computer Programming*, Volume 4, Combinatorial Algorithms: Part 1.693 (Addison-Wesley Professional), (2011).
 
 ## Requirements
 
