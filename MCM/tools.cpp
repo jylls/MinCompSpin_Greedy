@@ -1,11 +1,11 @@
-#include <bitset>
+#include <string>
 #include <map>
 
 /******************************************************************************/
 /***************************   Constant variables   ***************************/
 /******************************************************************************/
-const unsigned int n_max = 128;  // for bitset
 const unsigned int un = 1;
+//const unsigned int n_max = 128;  // for bitset
 
 /******************************************************************************/
 /*******************   Convert Integer to Binary string   *********************/
@@ -36,27 +36,12 @@ std::string int_to_bstring(__int128_t bool_nb, unsigned int n)
 /******************************************************************************/
 /****************   Count number of set bits of an integer  *******************/
 /******************************************************************************/
-unsigned int Bitset_count(__int128_t bool_nb)     
-// with Bitset: fixed time --> faster then "count_SetBits" for large values of n; for small values of n it is also faster than "count_SetBits", but not if we call systematically bitset<128>() -- as this could be a way to avoid defining "n" as a constant
-// As we are more interested in optimizing for large number of variables, we will choose the option of using "bitset<128>()", instead of a manual count of the bit.
+unsigned int Bitset_count(__int128_t bool_nb)      // Using trick; by far the fastest option in all cases (faster than using bitset library or checking bits one by one)
 {
-  std::bitset<n_max> hi{ static_cast<unsigned long long>(bool_nb >> 64) },
-            lo{ static_cast<unsigned long long>(bool_nb) },
-            bits{ (hi << 64) | lo };
-  return bits.count();
-}
-
-unsigned int count_SetBits(__int128_t bool_nb)     // time depends on the position of the highest bit
-{
-    unsigned int bit_count = 0;
-
-    while(bool_nb!=0)
-    {
-        if(bool_nb & un)   
-            {   bit_count++;    }
-        bool_nb >>= 1;
-    }   
-    return bit_count;
+    unsigned int count;
+    for (count=0; bool_nb; count++)
+        bool_nb &= bool_nb - 1;
+    return count;
 }
 
 /******************************************************************************/
