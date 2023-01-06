@@ -65,7 +65,6 @@ map<__int128_t, unsigned int> read_datafile(unsigned int *N, string file, unsign
     else
     {
         cout << endl << "                     ########## Unable to open file ##########" << endl << endl;
-        //(*N) = 0;
     }
     //cout << "\t\t data size N = " << (*N) << endl;
     return Nset;
