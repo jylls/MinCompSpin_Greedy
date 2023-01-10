@@ -41,6 +41,17 @@ To efficiently generate all possible set partitions of these `r` operators, we u
 
 The code uses the C++11 version of C++.
 
+## Usage
+
+### If your are working on linux or macOS: you can use the makefile.
+
+Open the makefile and replace the values of these two variables at the top of the file:
+ - `datafile`: path to your own datafile;
+ - `n`: number of variables in your file.
+An example is provided.
+
+Then you can use the following commands from your terminal:
+
 **To compile:** `make`
 
 **To run:** `make run`
