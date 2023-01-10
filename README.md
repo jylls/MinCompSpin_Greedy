@@ -51,11 +51,9 @@ Open the makefile and replace the values of these two following variables at the
 
 Then you can use the following commands from your terminal:
 
-**To compile:** `make`
-
-**To run:** `make run`
-
-**To clean:** `make clean` (to use only once you're done using the code)
+ - **To compile:** `make`
+ - **To run:** `make run`
+ - **To clean:** `make clean` (to use only once you're done using the code)
 
 ### On any operating system:
 
