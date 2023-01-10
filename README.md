@@ -43,7 +43,7 @@ The code uses the C++11 version of C++.
 
 ## Usage
 
-### If your are working on linux or macOS: you can use the makefile.
+### On Linux or macOS:
 
 Open the makefile and replace the values of these two variables at the top of the file:
  - `datafile`: path to your own datafile;
@@ -57,6 +57,9 @@ Then you can use the following commands from your terminal:
 **To run:** `make run`
 
 **To clean:** `make clean` (to use only once you're done using the code)
+
+### On any operating system:
+
 
 ## Examples
 
