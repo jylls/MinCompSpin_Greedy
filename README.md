@@ -45,7 +45,7 @@ The code uses the C++11 version of C++.
 
 ### On Linux or macOS:
 
-Open the makefile and replace the values of these two variables at the top of the file:
+Open the makefile and replace the values of these two following variables at the very top of the file:
  - `datafile`: path to your own datafile;
  - `n`: number of variables in your file.
 An example is provided.
