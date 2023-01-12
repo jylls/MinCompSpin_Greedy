@@ -65,3 +65,17 @@ All the useful functions that can be called from `int main()` are declared at th
 ## License
 
 This code is an open source project under the GNU GPLv3.
+
+----
+
+## Important information:
+### Basis change:
+To change the basis of the data to a chosen basis and apply the MCM search in this new basis:
+ 1. Specify the basis elements in a list of integers `list<__int128_t> basis_li = ` using one of the available function.
+ 2. Transform the dataset `Nset` into the new basis (transformed data is in `Kset`) using the function `map<__int128_t, unsigned int> Kset = build_Kset(Nset, Basis_li);`
+
+!!Important!! when performing this basis transformation, basis operators are placed from the right to the left in the new basis, 
+i.e. the bit the most to the right (lowest bit) corresponds to the first operator in "list<__int128_t> Basis".
+
+This very important for when you will be interpreting the output of the MCM algorithm.
+
