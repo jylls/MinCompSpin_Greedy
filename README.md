@@ -8,6 +8,8 @@ The idea of the algorithm is based on performing statistical inference with a fa
 
 A **simulated annealing version** of the optimization procedure can also be found [here](https://github.com/ebokai/MinCompSpin_SimulatedAnnealing), and allow to find a solution closer to the global optimal when the search space becomes too large.
 
+The program can run for up to 127 variables, which are indexed from i=0 to 126 in the program.
+
 ----
 
 This repository contains a code initially developed for the paper Ref. [1] on *Statistical Inference of Minimally Complex Models* and later optimised for the paper Ref.[2]. The code performs a greedy search for the best Minimally Complex Spin Model (MCM) on a basis provided by the user. This greedy approach is useful for systems with a large number of variables, `n > 15`. 
@@ -49,7 +51,7 @@ The code uses the C++11 version of C++.
 
 Open the makefile and replace the values of these two following variables at the very top of the file (an example is provided):
  - `datafile`: path to your own datafile;
- - `n`: number of variables in your file.
+ - `n`: number of variables in your file; maximum possible value n = 127.
 
 Then you can use the following commands from your terminal:
 
