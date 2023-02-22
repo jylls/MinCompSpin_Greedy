@@ -12,6 +12,7 @@ unsigned int Bitset_count(__int128_t bool_nb);
 /******************************************************************************/
 /*******************************    CONSTANTS     *****************************/
 /******************************************************************************/
+const __int128_t one128 = 1;
 
 pair<bool, unsigned int> check_partition(map<unsigned int, __int128_t> Partition);
 
@@ -39,8 +40,8 @@ double LogE_SubC_forMCM(map<__int128_t, unsigned int> Kset, unsigned int m, unsi
   }
   if (Ncontrol != N) { cout << "Error Likelihood function: Ncontrol != N" << endl;  }
 
-//  return LogE - GeomComplexity_SubCM(m) - lgamma( (double)( N + (1UL << (m-1)) ) );
-  return LogE + lgamma((double)( 1UL << (m-1) )) - (Kset.size()/2.) * log(M_PI) - lgamma( (double)( N + (1UL << (m-1)) ) ); 
+//  return LogE - GeomComplexity_SubCM(m) - lgamma( (double)( N + (one128 << (m-1)) ) );
+  return LogE + lgamma((double)( one128 << (m-1) )) - (Kset.size()/2.) * log(M_PI) - lgamma( (double)( N + (one128 << (m-1)) ) ); 
 }
 
 /******************************************************************************/
@@ -69,12 +70,6 @@ double LogE_SubCM(map<__int128_t, unsigned int> Kset, __int128_t Ai, unsigned in
     Kset_new[s] += ks;
   }
 
-  //bitset<n> hi{ static_cast<unsigned long long>(Ai >> 64) },
-  //    lo{ static_cast<unsigned long long>(Ai) },
-  //    bits{ (hi << 64) | lo };
-
-  //unsigned int m = Bitset_count(Ai);
-
   return LogE_SubC_forMCM(Kset_new, Bitset_count(Ai), N);
 }
 
@@ -94,12 +89,7 @@ double LogE_MCM(map<__int128_t, unsigned int> Kset, map<unsigned int, __int128_t
 
     for (Part = Partition.begin(); Part != Partition.end(); Part++)
     {
-        /*bitset<n> hi{ static_cast<unsigned long long>((*Part).second >> 64) },
-            lo{ static_cast<unsigned long long>((*Part).second) },
-            bits{ (hi << 64) | lo };*/
-
       LogE += LogE_SubCM(Kset, (*Part).second, N);
-      //rank += bits.count();
       rank += Bitset_count((*Part).second);
     }  
     return LogE - ((double) (N * (r-rank))) * log(2.);
