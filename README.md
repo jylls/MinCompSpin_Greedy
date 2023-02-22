@@ -6,6 +6,8 @@ This program allows to **find community structures in binary data**, taking into
 
 The idea of the algorithm is based on performing statistical inference with a family of spin models (maximum entropy models for binary data) that have minimal information theoretic complexity. These models are called Minimally Complex Models (MCM). Details can be found in the paper [1] *Statistical Inference of Minimally Complex Models* available in [arXiv:2008.00520](https://arxiv.org/abs/2008.00520) 
 
+A simulated annealing version of the algorithm can also be found [here](https://github.com/ebokai/MinCompSpin_SimulatedAnnealing), and allow to find a solution closer to the global optimal when the search space becomes too large.
+
 ----
 
 This repository contains a code initially developed for the paper Ref. [1] on *Statistical Inference of Minimally Complex Models* and later optimised for the paper Ref.[2]. The code performs a greedy search for the best Minimally Complex Spin Model (MCM) on a basis provided by the user. This greedy approach is useful for systems with a large number of variables, `n > 15`. 
