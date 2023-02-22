@@ -4,7 +4,7 @@
 /******************************************************************************/
 /***************************   Constant variables   ***************************/
 /******************************************************************************/
-const unsigned int un = 1;
+const uint32_t un32 = 1;  // we only need the first bit here -->> will be used to check the lowest bit of other unsigned integer (with arbitrarily larger number of bits)
 //const unsigned int n_max = 128;  // for bitset
 
 /******************************************************************************/
@@ -15,7 +15,7 @@ std::string int_to_bstring(__int128_t bool_nb, unsigned int n)
     std::string s;
     do
     {
-        s.push_back( ((bool_nb & un)?'1':'0') );
+        s.push_back( ((bool_nb & un32)?'1':'0') );
     } while(bool_nb >>= 1);
 
     reverse(s.begin(), s.end());
