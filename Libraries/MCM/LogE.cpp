@@ -12,6 +12,7 @@ unsigned int Bitset_count(__int128_t bool_nb);
 /******************************************************************************/
 /*******************************    CONSTANTS     *****************************/
 /******************************************************************************/
+const unsigned int un = 1;
 
 pair<bool, unsigned int> check_partition(map<unsigned int, __int128_t> Partition);
 
@@ -39,8 +40,8 @@ double LogE_SubC_forMCM(map<__int128_t, unsigned int> Kset, unsigned int m, unsi
   }
   if (Ncontrol != N) { cout << "Error Likelihood function: Ncontrol != N" << endl;  }
 
-//  return LogE - GeomComplexity_SubCM(m) - lgamma( (double)( N + (1UL << (m-1)) ) );
-  return LogE + lgamma((double)( 1UL << (m-1) )) - (Kset.size()/2.) * log(M_PI) - lgamma( (double)( N + (1UL << (m-1)) ) ); 
+//  return LogE - GeomComplexity_SubCM(m) - lgamma( (double)( N + (un << (m-1)) ) );
+  return LogE + lgamma((double)( un << (m-1) )) - (Kset.size()/2.) * log(M_PI) - lgamma( (double)( N + (un << (m-1)) ) ); 
 }
 
 /******************************************************************************/

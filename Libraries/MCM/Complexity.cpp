@@ -8,6 +8,8 @@
 /******************************************************************************/
 unsigned int Bitset_count(__int128_t bool_nb);
 
+const unsigned int un = 1;
+
 /******************************************************************************/
 /**************************   MODEL COMPLEXITY   ******************************/
 /******************************************************************************/
@@ -17,13 +19,13 @@ unsigned int Bitset_count(__int128_t bool_nb);
 // for 1 <= m <= n . Rem C(m=1) = log(pi)
 double GeomComplexity_SubCM(unsigned int m)     // Geometric complexity
 {
-  double pow = (double) ( 1UL << (m-1) );
+  double pow = (double) ( un << (m-1) );
   return (log(M_PI) * pow - lgamma(pow)  );   // lgamma(x) = log(gamma(x))
 }
 
 double ParamComplexity_SubCM(unsigned int m, unsigned int N)  // Parameter Complexity
 {
-  uint32_t K = (1UL << m) - 1;  // number of interactions
+  uint32_t K = (un << m) - 1;  // number of interactions
   return K * log(((double) N)/2./M_PI) / 2.;
 }
 
