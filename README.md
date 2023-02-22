@@ -8,7 +8,7 @@ The idea of the algorithm is based on performing statistical inference with a fa
 
 A **simulated annealing version** of the optimization procedure can also be found [here](https://github.com/ebokai/MinCompSpin_SimulatedAnnealing), and allow to find a solution closer to the global optimal when the search space becomes too large.
 
-The program can run for up to 127 variables, which are indexed from i=0 to 126 in the program.
+The program can run for up to `n=127` variables, which are indexed from `i=0` to `126` in the program.
 
 ----
 
