@@ -51,7 +51,7 @@ The code uses the C++11 version of C++.
 
 Open the makefile and replace the values of these two following variables at the very top of the file (an example is provided):
  - `datafile`: path to your own datafile;
- - `n`: number of variables in your file; maximum possible value n = 127.
+ - `n`: number of variables in your file; maximum possible value `n = 127`.
 
 Then you can use the following commands from your terminal:
 
