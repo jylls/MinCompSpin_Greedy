@@ -5,8 +5,8 @@
 ####     then the program will automatically use the filename and number of variables specifed in data.h    ############
 ########################################################################################################################
 
-datafilename := INPUT/SCOTUS_n9_N895_Data.dat  # datafile name
-n := 9		# number of binary variables in the datafile 
+datafilename := /content/MinCompSpin_Greedy/INPUT/toy_data.dat 
+n := 120		# number of binary variables in the datafile 
 
 
 ########################################################################################################################
