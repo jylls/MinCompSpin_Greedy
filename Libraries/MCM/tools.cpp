@@ -19,7 +19,7 @@ std::string int_to_bstring(__int128_t bool_nb, unsigned int n)
         s.push_back( ((bool_nb & un32)?'1':'0') );
     } while(bool_nb >>= 1);
 
-    reverse(s.begin(), s.end());
+    std::reverse(s.begin(), s.end());
     s = (std::string(n - s.length(), '0')).append(s);
 
     return s;
