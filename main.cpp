@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
     cout << "Average comm size : " << (double)n / (double)fp1.size() << endl << endl;
 
     cout << "#########  THEORETICAL   #########" << endl;
+    /*
     map<unsigned int, __int128_t> fp2 = read_MCM_fromfile(communityfile, n);
 
     double LE_t = LogE_MCM(Kset, fp2, N, n);
@@ -172,6 +173,7 @@ int main(int argc, char *argv[])
 
     // Print the state probabilities P(s) (in the Data VS MCM) using the data transformed in the bew basis:
     PrintFile_StateProbabilites_NewBasis(Kset, fp1, N, n, "Result");
+    */
 
     return 0;
 }
